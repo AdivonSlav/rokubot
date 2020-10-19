@@ -11,7 +11,7 @@ const queue = new Map();
 
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
-client.login(process.env.NzY3Nzc5NDg4OTM4ODUyMzky.X424Xg.U9h0GfsJGPKKVZfxUVWM4Kov7YM);
+client.login(process.env.BOT_TOKEN);
 
 // Console logging when executing
 client.once('ready', () => {
