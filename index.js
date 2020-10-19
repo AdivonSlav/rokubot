@@ -74,7 +74,7 @@ async function execute(message, serverQueue) {
             connection: null,
             songs: [],
             volume: 5,
-            playing: true,
+            playing: true
         };
         // Setting the queue using the contract
         queue.set(message.guild.id, queueContract);
@@ -94,8 +94,7 @@ async function execute(message, serverQueue) {
             return message.channel.send(err);
         }
     } else {
-        serverQueue.songs.push();
-        console.log(serverQueue.songs);
+        serverQueue.songs.push(song);
         return message.channel.send(`${song.title} has been added to the queue`);
     }
 }
@@ -112,7 +111,7 @@ function play(guild, song) {
     .play(ytdl(song.url))
     .on("finish", () => {
         serverQueue.songs.shift();
-        play(guild, serverQueue.song[0]);
+        play(guild, serverQueue.songs[0]);
     })
     .on("error", error => console.error(error));
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
