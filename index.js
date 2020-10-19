@@ -102,7 +102,7 @@ async function execute(message, serverQueue) {
 function play(guild, song) {
     const serverQueue = queue.get(guild.id);
     if (!song) {
-        serverQueue.voiceChannel.leave();
+       // serverQueue.voiceChannel.leave();
         queue.delete(guild.id);
         return;
     }
