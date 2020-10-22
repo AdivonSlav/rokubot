@@ -5,7 +5,7 @@ const {
     token,
 } = require('./config.json');
 const ytdl = require('ytdl-core');
-const yts = require( 'yt-search' );
+const yts = require('yt-search');
 
 // Queue where songs are saved
 const queue = new Map();
