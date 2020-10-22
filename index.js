@@ -5,6 +5,7 @@ const {
     token,
 } = require('./config.json');
 const ytdl = require('ytdl-core');
+const yts = require("yt-search");
 
 // Queue where songs are saved
 const queue = new Map();
@@ -58,12 +59,30 @@ async function execute(message, serverQueue) {
         return message.channel.send("I don't have the perms to talk or join bro.");
     }
 
+    // Gets song info from either URL or typed name and saves it into a song objects using ytdl from YouTube
+    if (ytdl.validateURL(args[1])) {
+        const songInfo = await ytdl.getInfo(args[1]);
+        song = {
+            title: songInfo.videoDetails.title,
+            url: songInfo.videoDetails.video_url
+        };
+    } else {
+        const {videos} = await yts(args.slice(1).join(" "));
+        if (!videos.length) return message.channel.send("No songs mate");
+        song = {
+            title: videos[0].title,
+            url: videos[0].url
+        };
+    }
+
+    /*
     // Gets the song info and saves it into a song object using the ytdl library which gets it from a youtube link.
     const songInfo = await ytdl.getInfo(args[1]);
     const song = {
         title: songInfo.videoDetails.title,
         url: songInfo.videoDetails.video_url,
     };
+    */
 
     // Checks if the serverQueue is defined (music is playing) and if so, adds the song to the queue. If it's not then it creates it and tries to join the channel.
     if (!serverQueue) {
