@@ -160,15 +160,13 @@ function help(message) {
         value: "`b$play [URL/Title] (Searches YouTube for the entered title or URL and plays it)`"
         + "\n`b$skip (Skips the current track that is playing and moves to the next)`"
         + "\n`b$stop (Stops the bot and disconnects it from the channel)`"
-        + "\n`b$help (Opens this beautiful window)`" 
-        + "\n`b$help (Opens this beautiful window)`" 
+        + "\n`b$help (Opens this beautiful window)`"  
         + "\n`b$info (Displays the current track info)`"
     }
     )
     message.channel.send(helpwindow);
 }
 
-/*
 async function info(message, serverQueue) {
     const trackInfo = await ytdl.getInfo(args[1])
     if (!message.member.voice.channel)
@@ -177,5 +175,4 @@ async function info(message, serverQueue) {
         return message.channel.send("Nothing is playing");
     message.channel.send(trackInfo.videoDetails.title);
 }
-*/
 
