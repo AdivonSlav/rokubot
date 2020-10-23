@@ -7,8 +7,9 @@ const {
 const ytdl = require('ytdl-core');
 const yts = require('yt-search');
 
-// Queue where songs are saved
+// Queue where songs are saved and saves track info into a variable
 const queue = new Map();
+var trackInfo;
 
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
@@ -52,7 +53,7 @@ client.on('message', async message => {
 var commands = ["$play", "$skip", "$stop", "$help"];
 
 // Checks if the user is in a voice chat and if the bot has the correct perms. If not, it outputs an error
-async function execute(message, serverQueue) {
+async function execute(message, serverQueue, trackInfo) {
     const args = message.content.split(" ");
 
     const voiceChannel = message.member.voice.channel;
@@ -72,7 +73,8 @@ async function execute(message, serverQueue) {
             title: songInfo.videoDetails.title,
             url: songInfo.videoDetails.video_url
         };
-    } else {
+        trackInfo = songInfo.videoDetails.title;
+    } else { 
         const {videos} = await yts(args.slice(1).join(" "));
         if (!videos.length) return message.channel.send("No songs mate");
         song = {
@@ -80,15 +82,6 @@ async function execute(message, serverQueue) {
             url: videos[0].url
         };
     }
-
-    /*
-    // Gets the song info and saves it into a song object using the ytdl library which gets it from a youtube link.
-    const songInfo = await ytdl.getInfo(args[1]);
-    const song = {
-        title: songInfo.videoDetails.title,
-        url: songInfo.videoDetails.video_url,
-    };
-    */
 
     // Checks if the serverQueue is defined (music is playing) and if so, adds the song to the queue. If it's not then it creates it and tries to join the channel.
     if (!serverQueue) {
@@ -161,15 +154,26 @@ function stop(message, serverQueue) {
 }
 
 // The help command lists all the available commands to the user
-function help(message, serverQueue) {
+function help(message) {
     const helpwindow = new Discord.MessageEmbed()
     .setTitle('List of commands')
     .addFields(
-        {name: 'Test',
-        value: "`test1`\n`test2`"}
+        {name: 'General',
+        value: "`$play [URL/Title] (Searches YouTube for the entered title or URL and plays it)`",
+        value: "`$skip (Skips the current track that is playing and moves to the next)`",
+        value: "`$stop (Stops the bot and disconnects it from the channel)`",
+        value: "`$help (Opens this beautiful window)`"
+    }
     )
     message.channel.send(helpwindow);
 }
 
+function info(message, serverQueue, trackInfo) {
+    if (!message.member.voice.channel)
+        return message.channel.send("No peeking without being in there");
+    if (!serverQueue)
+        return message.channel.send("Nothing is playing");
+    message.channel.send("`" + trackInfo + " is currently playing`");
+}
 
 
