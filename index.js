@@ -45,12 +45,13 @@ client.on('message', async message => {
     } else if (message.content.startsWith(`${prefix}help`)) {
         help(message, serverQueue);
         return;
-    } else {
+    } else if (message.content.startsWith(`${prefix}info`)) {
+        info(message, serverQueue, trackInfo);
+    } 
+    else {
         message.channel.send("Enter a valid command bro.");
     }
 });
-
-var commands = ["$play", "$skip", "$stop", "$help"];
 
 // Checks if the user is in a voice chat and if the bot has the correct perms. If not, it outputs an error
 async function execute(message, serverQueue, trackInfo) {
@@ -159,10 +160,11 @@ function help(message) {
     .setTitle('List of commands')
     .addFields(
         {name: 'General',
-        value: "`$play [URL/Title] (Searches YouTube for the entered title or URL and plays it)`",
-        value: "`$skip (Skips the current track that is playing and moves to the next)`",
-        value: "`$stop (Stops the bot and disconnects it from the channel)`",
-        value: "`$help (Opens this beautiful window)`"
+        value: "`b$play [URL/Title] (Searches YouTube for the entered title or URL and plays it)`",
+        value: "`b$skip (Skips the current track that is playing and moves to the next)`",
+        value: "`b$stop (Stops the bot and disconnects it from the channel)`",
+        value: "`b$help (Opens this beautiful window)`",
+        value: "`b$info (Displays the current track info)`"
     }
     )
     message.channel.send(helpwindow);
