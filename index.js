@@ -10,6 +10,7 @@ const yts = require('yt-search');
 // Queue where songs are saved and saves track info into a variable
 const queue = new Map();
 var infoTick;
+var infoTrack;
 
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
@@ -73,6 +74,7 @@ async function execute(message, serverQueue) {
             title: songInfo.videoDetails.title,
             url: songInfo.videoDetails.video_url
         };
+        infoTrack = songInfo.videoDetails.title;
     } else {
         const {videos} = await yts(args.slice(1).join(" "));
         if (!videos.length) return message.channel.send("No songs mate");
@@ -80,17 +82,8 @@ async function execute(message, serverQueue) {
             title: videos[0].title,
             url: videos[0].url
         }; 
+        infoTrack = videos[0].title;
     } 
-
-    /*
-    function info(message, serverQueue) {
-        if (!message.member.voice.channel)
-            return message.channel.send("No peeking without being in there");
-        if (!serverQueue)
-            return message.channel.send("Nothing is playing");
-        message.channel.send(`**${songInfo.videoDetails.title}** is currently playing`);
-    }
-    */
 
     // Checks if the serverQueue is defined (music is playing) and if so, adds the song to the queue. If it's not then it creates it and tries to join the channel.
     if (!serverQueue) {
@@ -178,13 +171,10 @@ function help(message) {
     message.channel.send(helpwindow);
 }
 
-async function info(message) {
-    
-    const args = message.content.split(" ");
+function info(message) {
 
     if (infoTick == true) {
-        const songInfo = await ytdl.getInfo(args[1]);
-        message.channel.send(`${songInfo.videoDetails.title} is currently playing`)
+        message.channel.send(`${infoTrack} is currently playing`)
         infoTick = false;
     }
 }
