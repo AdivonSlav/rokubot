@@ -41,10 +41,15 @@ client.on('message', async message => {
     } else if (message.content.startsWith(`${prefix}stop`)) {
         stop(message, serverQueue);
         return;
+    } else if (message.content.startsWith(`${prefix}help`)) {
+        help(message, serverQueue);
+        return;
     } else {
         message.channel.send("Enter a valid command bro.");
     }
 });
+
+var commands = ["$play", "$skip", "$stop", "$help"];
 
 // Checks if the user is in a voice chat and if the bot has the correct perms. If not, it outputs an error
 async function execute(message, serverQueue) {
@@ -153,6 +158,13 @@ function stop(message, serverQueue) {
         return message.channel.send("Can't stop the music if you're not listening to it bro.");
     serverQueue.songs = [];
     serverQueue.connection.dispatcher.end();
+}
+
+// The help command lists all the available commands to the user
+function help(message, serverQueue) {
+    let helpwindow = `$play (Plays a song from an entered YouTube URL or video title) - $play [URL/Name]` + `\n$skip (Skips the current playing song in the queue)` + `\n$stop (Stops the current playing song and disconnects the bot)`
+    + `$help (Displays all the possible commands of the bot)`;
+    message.channel.send(helpwindow);
 }
 
 
