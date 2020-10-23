@@ -46,8 +46,7 @@ client.on('message', async message => {
         return;
     } else if (message.content.startsWith(`${prefix}info`)) {
         info(message, serverQueue, trackInfo);
-    } 
-    else {
+    } else {
         message.channel.send("Enter a valid command bro.");
     }
 });
@@ -169,6 +168,7 @@ function help(message) {
     message.channel.send(helpwindow);
 }
 
+/*
 async function info(message, serverQueue) {
     const trackInfo = await ytdl.getInfo(args[1])
     if (!message.member.voice.channel)
@@ -177,5 +177,5 @@ async function info(message, serverQueue) {
         return message.channel.send("Nothing is playing");
     message.channel.send(trackInfo.videoDetails.title);
 }
-
+*/
 
