@@ -45,7 +45,7 @@ client.on('message', async message => {
         help(message, serverQueue);
         return;
     } else if (message.content.startsWith(`${prefix}info`)) {
-        info(message, serverQueue);
+        info(message, serverQueue, song);
     } else {
         message.channel.send("Enter a valid command bro.");
     }
