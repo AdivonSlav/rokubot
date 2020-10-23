@@ -162,8 +162,12 @@ function stop(message, serverQueue) {
 
 // The help command lists all the available commands to the user
 function help(message, serverQueue) {
-    let helpwindow = `$play (Plays a song from an entered YouTube URL or video title) - $play [URL/Name]` + `\n$skip (Skips the current playing song in the queue)` + `\n$stop (Stops the current playing song and disconnects the bot)`
-    + `$help (Displays all the possible commands of the bot)`;
+    const helpwindow = new Discord.MessageEmbed()
+    .setTitle('List of commands')
+    .addFields(
+        {name: 'Test',
+        value: "`test1`\n`test2`"}
+    )
     message.channel.send(helpwindow);
 }
 
