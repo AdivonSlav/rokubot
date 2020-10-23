@@ -46,8 +46,6 @@ client.on('message', async message => {
         return;
     } else if (message.content.startsWith(`${prefix}info`)) {
         info(message, serverQueue);
-    } else if (message.content.startsWith(`${prefix}miranda`)) {
-        miranda(message);
     } else {
         message.channel.send("Enter a valid command bro.");
     }
@@ -176,8 +174,4 @@ function help(message) {
     }
     )
     message.channel.send(helpwindow);
-}
-
-function miranda(message) {
-    message.channel.send("", {files: ["https://i.imgur.com/LHHIEsi.gif"]});
 }
