@@ -160,11 +160,12 @@ function help(message) {
     .setTitle('List of commands')
     .addFields(
         {name: 'General',
-        value: "`b$play [URL/Title] (Searches YouTube for the entered title or URL and plays it)`",
-        value: "`b$skip (Skips the current track that is playing and moves to the next)`",
-        value: "`b$stop (Stops the bot and disconnects it from the channel)`",
-        value: "`b$help (Opens this beautiful window)`",
-        value: "`b$info (Displays the current track info)`"
+        value: "`b$play [URL/Title] (Searches YouTube for the entered title or URL and plays it)`"
+        + "`\nb$skip (Skips the current track that is playing and moves to the next)`"
+        + "\n`b$stop (Stops the bot and disconnects it from the channel)`"
+        + "\n`b$help (Opens this beautiful window)`" 
+        + "\n`b$help (Opens this beautiful window)`" 
+        + "\n`b$info (Displays the current track info)`"
     }
     )
     message.channel.send(helpwindow);
