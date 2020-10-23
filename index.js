@@ -47,6 +47,7 @@ client.on('message', async message => {
         return;
     } else if (message.content.startsWith(`${prefix}info`)) {
         infoTick = true;
+        info(message);
     } else {
         message.channel.send("Enter a valid command bro.");
     }
@@ -80,12 +81,6 @@ async function execute(message, serverQueue) {
             url: videos[0].url
         }; 
     } 
-
-    if (infoTick == true) {
-        const songInfo = await ytdl.getInfo(args[1]);
-        message.channel.send(`${songInfo.videoDetails.title} is currently playing`)
-        infoTick = false;
-    }
 
     /*
     function info(message, serverQueue) {
@@ -181,4 +176,15 @@ function help(message) {
     }
     )
     message.channel.send(helpwindow);
+}
+
+async function info(message) {
+    
+    const args = message.content.split(" ");
+
+    if (infoTick == true) {
+        const songInfo = await ytdl.getInfo(args[1]);
+        message.channel.send(`${songInfo.videoDetails.title} is currently playing`)
+        infoTick = false;
+    }
 }
