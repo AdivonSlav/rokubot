@@ -10,8 +10,6 @@ const yts = require('yt-search');
 // Queue where songs are saved and saves track info into a variable
 const queue = new Map();
 
-var songTitle;
-
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
 client.login(process.env.BOT_TOKEN);
@@ -47,14 +45,16 @@ client.on('message', async message => {
         help(message, serverQueue);
         return;
     } else if (message.content.startsWith(`${prefix}info`)) {
-        info(message, serverQueue, songTitle);
+        info(message, serverQueue);
+    } else if (message.content.startsWith(`${prefix}miranda`)) {
+        miranda(message);
     } else {
         message.channel.send("Enter a valid command bro.");
     }
 });
 
 // Checks if the user is in a voice chat and if the bot has the correct perms. If not, it outputs an error
-async function execute(message, serverQueue, songTitle) {
+async function execute(message, serverQueue) {
     const args = message.content.split(" ");
 
     const voiceChannel = message.member.voice.channel;
@@ -73,7 +73,6 @@ async function execute(message, serverQueue, songTitle) {
             title: songInfo.videoDetails.title,
             url: songInfo.videoDetails.video_url
         };
-        songTitle = songInfo.videoDetails.title;
     } else {
         const {videos} = await yts(args.slice(1).join(" "));
         if (!videos.length) return message.channel.send("No songs mate");
@@ -82,6 +81,16 @@ async function execute(message, serverQueue, songTitle) {
             url: videos[0].url
         }; 
     } 
+
+    /*
+    function info(message, serverQueue) {
+        if (!message.member.voice.channel)
+            return message.channel.send("No peeking without being in there");
+        if (!serverQueue)
+            return message.channel.send("Nothing is playing");
+        message.channel.send(`**${songInfo.videoDetails.title}** is currently playing`);
+    }
+    */
 
     // Checks if the serverQueue is defined (music is playing) and if so, adds the song to the queue. If it's not then it creates it and tries to join the channel.
     if (!serverQueue) {
@@ -169,10 +178,6 @@ function help(message) {
     message.channel.send(helpwindow);
 }
 
-function info(message, serverQueue, songTitle) {
-    if (!message.member.voice.channel)
-        return message.channel.send("No peeking without being in there");
-    if (!serverQueue)
-        return message.channel.send("Nothing is playing");
-    message.channel.send(`**${songTitle}** is currently playing`);
+function miranda(message) {
+    message.channel.send("", {files: ["https://i.imgur.com/LHHIEsi.gif"]});
 }
