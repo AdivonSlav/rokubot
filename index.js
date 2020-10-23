@@ -169,7 +169,7 @@ function help(message) {
     message.channel.send(helpwindow);
 }
 
-function info(message, serverQueue) {
+async function info(message, serverQueue) {
     const trackInfo = await ytdl.getInfo(args[1])
     if (!message.member.voice.channel)
         return message.channel.send("No peeking without being in there");
