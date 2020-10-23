@@ -79,16 +79,6 @@ async function execute(message, serverQueue, trackInfo) {
             url: videos[0].url
         }; 
     } 
-    /*  
-    else { 
-        const {videos} = await yts(args.slice(1).join(" "));
-        if (!videos.length) return message.channel.send("No songs mate");
-        song = {
-            title: videos[0].title,
-            url: videos[0].url
-        };
-    }
-    */
 
     // Checks if the serverQueue is defined (music is playing) and if so, adds the song to the queue. If it's not then it creates it and tries to join the channel.
     if (!serverQueue) {
@@ -176,12 +166,10 @@ function help(message) {
     message.channel.send(helpwindow);
 }
 
-/*
-function info(message, serverQueue, songInfo) {
+function info(message, serverQueue, song) {
     if (!message.member.voice.channel)
         return message.channel.send("No peeking without being in there");
     if (!serverQueue)
         return message.channel.send("Nothing is playing");
-    message.channel.send(songInfo.videoDetails.title);
+    message.channel.send(`**${song.title}** is currently playing`);
 }
-*/
