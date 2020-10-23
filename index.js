@@ -65,14 +65,22 @@ async function execute(message, serverQueue, trackInfo) {
     }
 
     // Gets song info from either URL or typed name and saves it into a song objects using ytdl from YouTube
-    let song;
     if (ytdl.validateURL(args[1])) {
         const songInfo = await ytdl.getInfo(args[1]);
         song = {
             title: songInfo.videoDetails.title,
             url: songInfo.videoDetails.video_url
         };
-    } else { 
+    } else {
+        const {videos} = await yts(args.slice(1).join(" "));
+        if (!videos.length) return message.channel.send("No songs mate");
+        song = {
+            title: videos[0].title,
+            url: videos[0].url
+        }; 
+    } 
+    /*  
+    else { 
         const {videos} = await yts(args.slice(1).join(" "));
         if (!videos.length) return message.channel.send("No songs mate");
         song = {
@@ -80,6 +88,7 @@ async function execute(message, serverQueue, trackInfo) {
             url: videos[0].url
         };
     }
+    */
 
     // Checks if the serverQueue is defined (music is playing) and if so, adds the song to the queue. If it's not then it creates it and tries to join the channel.
     if (!serverQueue) {
@@ -167,11 +176,12 @@ function help(message) {
     message.channel.send(helpwindow);
 }
 
-async function info(message, serverQueue, songInfo) {
+/*
+function info(message, serverQueue, songInfo) {
     if (!message.member.voice.channel)
         return message.channel.send("No peeking without being in there");
     if (!serverQueue)
         return message.channel.send("Nothing is playing");
     message.channel.send(songInfo.videoDetails.title);
 }
-
+*/
