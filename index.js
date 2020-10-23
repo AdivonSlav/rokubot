@@ -9,7 +9,6 @@ const yts = require('yt-search');
 
 // Queue where songs are saved and saves track info into a variable
 const queue = new Map();
-var trackInfo;
 
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
@@ -74,7 +73,6 @@ async function execute(message, serverQueue, trackInfo) {
             title: songInfo.videoDetails.title,
             url: songInfo.videoDetails.video_url
         };
-        trackInfo = songInfo.videoDetails.title;
     } else { 
         const {videos} = await yts(args.slice(1).join(" "));
         if (!videos.length) return message.channel.send("No songs mate");
@@ -171,12 +169,13 @@ function help(message) {
     message.channel.send(helpwindow);
 }
 
-function info(message, serverQueue, trackInfo) {
+function info(message, serverQueue) {
+    const trackInfo = await ytdl.getInfo(args[1])
     if (!message.member.voice.channel)
         return message.channel.send("No peeking without being in there");
     if (!serverQueue)
         return message.channel.send("Nothing is playing");
-    message.channel.send("`" + trackInfo + " is currently playing`");
+    message.channel.send(trackInfo.videoDetails.title);
 }
 
 
