@@ -9,6 +9,7 @@ const yts = require('yt-search');
 
 // Queue where songs are saved and saves track info into a variable
 const queue = new Map();
+var infoTick;
 
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
@@ -45,7 +46,7 @@ client.on('message', async message => {
         help(message, serverQueue);
         return;
     } else if (message.content.startsWith(`${prefix}info`)) {
-        info(message, serverQueue);
+        infoTick = true;
     } else {
         message.channel.send("Enter a valid command bro.");
     }
@@ -79,6 +80,12 @@ async function execute(message, serverQueue) {
             url: videos[0].url
         }; 
     } 
+
+    if (infoTick == true) {
+        const songInfo = await ytdl.getInfo(args[1]);
+        message.channel.send(`${songInfo.videoDetails.title} is currently playing`)
+        infoTick = false;
+    }
 
     /*
     function info(message, serverQueue) {
