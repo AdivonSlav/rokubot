@@ -167,12 +167,11 @@ function help(message) {
     message.channel.send(helpwindow);
 }
 
-async function info(message, serverQueue) {
-    const trackInfo = await ytdl.getInfo(args[1])
+async function info(message, serverQueue, songInfo) {
     if (!message.member.voice.channel)
         return message.channel.send("No peeking without being in there");
     if (!serverQueue)
         return message.channel.send("Nothing is playing");
-    message.channel.send(trackInfo.videoDetails.title);
+    message.channel.send(songInfo.videoDetails.title);
 }
 
