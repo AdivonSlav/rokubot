@@ -18,7 +18,7 @@ const client = new Discord.Client();
 // Console logging when executing
 client.on('ready', () => {
     console.log('Ready!');
-    client.user.setActivity('Test');
+    client.user.setActivity('Mass Effect - b$help');
    });
 client.once('reconnecting', () => {
     console.log('Reconnecting!');
