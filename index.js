@@ -15,6 +15,7 @@ var infoTrack;
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
 client.login(process.env.BOT_TOKEN);
+client.user.setActivity("Ispija jednu po jednu... b$help")
 
 // Console logging when executing
 client.once('ready', () => {
@@ -174,7 +175,7 @@ function help(message) {
 function info(message) {
 
     if (infoTick == true) {
-        message.channel.send(`${infoTrack} is currently playing`)
+        message.channel.send(`Currently playing: **${infoTrack}**`)
         infoTick = false;
     }
 }
