@@ -14,7 +14,7 @@ var infoTrack;
 
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
-client.login(process.env.BOT_TOKEN);
+client.login(token);
 
 // Console logging when executing
 client.on('ready', () => {
