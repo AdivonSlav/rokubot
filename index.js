@@ -19,7 +19,6 @@ client.login(process.env.BOT_TOKEN);
 // Console logging when executing
 client.on('ready', () => {
     console.log('Ready!');
-    client.user.setPresence("Ispija jednu po jednu... b$help", { type: 'PLAYING' });
    });
 client.once('reconnecting', () => {
     console.log('Reconnecting!');
@@ -27,6 +26,10 @@ client.once('reconnecting', () => {
 client.once('disconnect', () => {
     console.log('Disconnect!');
    });
+
+client.user.setActivity('Ispija jednu po jednu...', { type: 'PLAYING' })
+.then(presence => console.log(`Activity set to ${presence.activities[0].name}`))
+.catch(console.error);
 
 // Reading messages and checking which command to execute. Returning error message if no command is entered
 client.on('message', async message => {
