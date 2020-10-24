@@ -15,7 +15,6 @@ var infoTrack;
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
 client.login(process.env.BOT_TOKEN);
-client.user.setActivity("Ispija jednu po jednu... b$help")
 
 // Console logging when executing
 client.once('ready', () => {
@@ -27,6 +26,8 @@ client.once('reconnecting', () => {
 client.once('disconnect', () => {
     console.log('Disconnect!');
    });
+
+client.user.setPresence("Ispija jednu po jednu... b$help", { type: 'PLAYING' });
 
 // Reading messages and checking which command to execute. Returning error message if no command is entered
 client.on('message', async message => {
