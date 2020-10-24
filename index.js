@@ -17,8 +17,9 @@ const client = new Discord.Client();
 client.login(process.env.BOT_TOKEN);
 
 // Console logging when executing
-client.once('ready', () => {
+client.on('ready', () => {
     console.log('Ready!');
+    client.user.setPresence("Ispija jednu po jednu... b$help", { type: 'PLAYING' });
    });
 client.once('reconnecting', () => {
     console.log('Reconnecting!');
@@ -26,8 +27,6 @@ client.once('reconnecting', () => {
 client.once('disconnect', () => {
     console.log('Disconnect!');
    });
-
-client.user.setPresence("Ispija jednu po jednu... b$help", { type: 'PLAYING' });
 
 // Reading messages and checking which command to execute. Returning error message if no command is entered
 client.on('message', async message => {
