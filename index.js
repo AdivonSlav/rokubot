@@ -27,9 +27,6 @@ client.once('disconnect', () => {
     console.log('Disconnect!');
    });
 
-// Creating the queue in global space in order to be able to declare the dispatcher down below
-const serverQueue = queue.get(message.guild.id);
-
 // Reading messages and checking which command to execute. Returning error message if no command is entered
 client.on('message', async message => {
     if (message.author.bot) return;
@@ -57,6 +54,10 @@ client.on('message', async message => {
         message.channel.send("Enter a valid command bro.");
     }
 });
+
+// Creating the necessary consts for the queue, dispatcher and message functionality
+const serverQueue = queue.get(message.guild.id);
+const dispatcher = serverQueue.connection
 
 // Checks if the user is in a voice chat and if the bot has the correct perms. If not, it outputs an error
 async function execute(message, serverQueue) {
@@ -124,7 +125,6 @@ async function execute(message, serverQueue) {
 }
 
 // Declaring the dispatcher outside the play function to be able to use it in the pause/resume functions
-const dispatcher = serverQueue.connection;
 
 function play(guild, song) {
     const serverQueue = queue.get(guild.id);
@@ -139,7 +139,7 @@ function play(guild, song) {
         serverQueue.songs.shift();
         play(guild, serverQueue.songs[0]);
     })
-    dispatcher.on("error", error => console.error(error));
+    dispatcher.on("error", error => console.error(error))
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
     serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
