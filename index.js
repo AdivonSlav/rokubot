@@ -11,6 +11,8 @@ const yts = require('yt-search');
 const queue = new Map();
 var infoTick;
 var infoTrack;
+var serverQueue;
+var dispatcher;
 
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
@@ -31,6 +33,8 @@ client.once('disconnect', () => {
 client.on('message', async message => {
     if (message.author.bot) return;
     if (!message.content.startsWith(prefix)) return;
+
+    const serverQueue = queue.get(message.guild.id);
 
     if (message.content.startsWith(`${prefix}play`)) {
         execute(message, serverQueue);
@@ -55,9 +59,6 @@ client.on('message', async message => {
     }
 });
 
-// Creating the necessary consts for the queue, dispatcher and message functionality
-const serverQueue = queue.get(message.guild.id);
-const dispatcher = serverQueue.connection
 
 // Checks if the user is in a voice chat and if the bot has the correct perms. If not, it outputs an error
 async function execute(message, serverQueue) {
@@ -124,8 +125,6 @@ async function execute(message, serverQueue) {
     }
 }
 
-// Declaring the dispatcher outside the play function to be able to use it in the pause/resume functions
-
 function play(guild, song) {
     const serverQueue = queue.get(guild.id);
     if (!song) {
@@ -134,13 +133,15 @@ function play(guild, song) {
         return;
     }
 
-    dispatcher.play(ytdl(song.url))
-    dispatcher.on("finish", () => {
+    const dispatcher = serverQueue.connection
+
+    .play(ytdl(song.url))
+    .on("finish", () => {
         serverQueue.songs.shift();
         play(guild, serverQueue.songs[0]);
     })
-    dispatcher.on("error", error => console.error(error))
-    dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+    .on("error", error => console.error(error))
+    .setVolumeLogarithmic(serverQueue.volume / 5);
     serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
 
@@ -190,7 +191,10 @@ function info(message) {
     }
 }
 
-function pause(message, serverQueue) {
+function pause(message, serverQueue, guild) {
+    const serverQueue = queue.get(guild.id);
+    const dispatcher = serverQueue.connection;
+
     if (!serverQueue) {
         return message.channel.send(`Nothing is currently playing bro`);
     }
