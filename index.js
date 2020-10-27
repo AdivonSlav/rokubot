@@ -50,10 +50,8 @@ client.on('message', async message => {
     } else if (message.content.startsWith(`${prefix}info`)) {
         infoTick = true;
         info(message, serverQueue);
-    } else if (message.content.startsWith(`${prefix}pause`)) {
-        pause(message, serverQueue);
-    } else if (message.content.startsWith(`${prefix}resume`)) {
-        resume(message, serverQueue);
+    } else if (message.content.startsWith(`${prefix}toggle`)) {
+        toggle(message, serverQueue);
     } else {
         message.channel.send("Enter a valid command bro.");
     }
@@ -140,6 +138,7 @@ function play(guild, song) {
     })
     .on("error", error => console.error(error));
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+    pausedTrack = false;
     serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
 
@@ -171,8 +170,7 @@ function help(message) {
         + "\n`b$stop (Stops the bot and disconnects it from the channel)`"
         + "\n`b$help (Opens this beautiful window)`"  
         + "\n`b$info (Displays the current track info)`"
-        + "\n`b$pause (Pauses the current track)`" 
-        + "\n`b$resume (Resumes the current track)`"
+        + "\n`b$tiggle (Pauses or resumes the current track)`" 
     }
     )
     message.channel.send(helpwindow);
@@ -191,33 +189,20 @@ function info(message, serverQueue) {
     }
 }
 
-function pause(message, serverQueue) {
-
+function toggle(message, serverQueue) {
+    
     if (!serverQueue) {
         message.channel.send(`Nothing is currently playing bro`);
     }
-    
-    else {
+  
+    else if (pausedTrack = false){
         serverQueue.connection.dispatcher.pause();
         pausedTrack = true;
     }
-}
 
-function resume(message, serverQueue) {
-    
-    if (!serverQueue) {
-        message.channel.send(`Can't resume if there's nothing running bro`);
-    }
-
-    else if (pausedTrack == true)
-    {
+    else if (pausedTrack = true) {
         serverQueue.connection.dispatcher.resume();
         pausedTrack = false;
-    }
-
-    else 
-    {
-        message.channel.send(`It's not paused bro`);
     }
 }
 
