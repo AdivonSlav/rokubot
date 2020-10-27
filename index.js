@@ -11,6 +11,7 @@ const yts = require('yt-search');
 const queue = new Map();
 var infoTick;
 var infoTrack;
+var pausedTrack;
 
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
@@ -198,6 +199,7 @@ function pause(message, serverQueue) {
     
     else {
         serverQueue.connection.dispatcher.pause();
+        pausedTrack = true;
     }
 }
 
@@ -207,9 +209,10 @@ function resume(message, serverQueue) {
         message.channel.send(`Can't resume if there's nothing running bro`);
     }
 
-    else if (serverQueue.connection.dispatcher.pause() == true)
+    else if (pausedTrack == true)
     {
         serverQueue.connection.dispatcher.resume();
+        pausedTrack = false;
     }
 
     else 
