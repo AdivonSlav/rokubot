@@ -171,7 +171,7 @@ function help(message) {
         + "\n`b$stop (Stops the bot and disconnects it from the channel)`"
         + "\n`b$help (Opens this beautiful window)`"  
         + "\n`b$info (Displays the current track info)`"
-        + "\n`b$tiggle (Pauses or resumes the current track)`" 
+        + "\n`b$toggle (Pauses or resumes the current track)`" 
     }
     )
     message.channel.send(helpwindow);
@@ -198,11 +198,13 @@ function toggle(message, serverQueue) {
   
     else if (pausedTrack == false){
         serverQueue.connection.dispatcher.pause();
+        message.channel.send(`Paused!`);
         pausedTrack = true;
     }
 
     else if (pausedTrack == true) {
         serverQueue.connection.dispatcher.resume();
+        message.channel.send(`Resumed!`);
         pausedTrack = false;
     }
 }
