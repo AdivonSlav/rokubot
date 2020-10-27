@@ -11,8 +11,6 @@ const yts = require('yt-search');
 const queue = new Map();
 var infoTick;
 var infoTrack;
-var serverQueue;
-var dispatcher;
 
 // Creating the actual client and logging in with the bot token
 const client = new Discord.Client();
@@ -53,8 +51,7 @@ client.on('message', async message => {
         info(message);
     } else if (message.content.startsWith(`${prefix}pause`)) {
         pause(message, serverQueue);
-    }
-     else {
+    } else {
         message.channel.send("Enter a valid command bro.");
     }
 });
@@ -134,9 +131,8 @@ function play(guild, song) {
     }
 
     const dispatcher = serverQueue.connection
-
-    .play(ytdl(song.url))
-    .on("finish", () => {
+        .play(ytdl(song.url))
+        .on("finish", () => {
         serverQueue.songs.shift();
         play(guild, serverQueue.songs[0]);
     })
@@ -173,6 +169,8 @@ function help(message) {
         + "\n`b$stop (Stops the bot and disconnects it from the channel)`"
         + "\n`b$help (Opens this beautiful window)`"  
         + "\n`b$info (Displays the current track info)`"
+        + "\n`b$pause (Pauses the current track)`" 
+        + "\n`b$resume (Resumes the current track)`"
     }
     )
     message.channel.send(helpwindow);
@@ -180,13 +178,13 @@ function help(message) {
 
 function info(message) {
 
-    if (infoTick == true && serverQueue) {
-        message.channel.send(`Currently playing: **${infoTrack}**`);
+    if (!serverQueue) {
+        message.channel.send(`Nothing is currently playing bro`);
         infoTick = false;
     }
 
     else {
-        message.channel.send(`Nothing is currently playing bro`);
+        message.channel.send(`Currently playing: **${infoTrack}**`);
         infoTick = false;
     }
 }
