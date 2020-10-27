@@ -48,9 +48,11 @@ client.on('message', async message => {
         return;
     } else if (message.content.startsWith(`${prefix}info`)) {
         infoTick = true;
-        info(message);
+        info(message, serverQueue);
     } else if (message.content.startsWith(`${prefix}pause`)) {
         pause(message, serverQueue);
+    } else if (message.content.startsWith(`${prefix}resume`)) {
+        resume(message, serverQueue);
     } else {
         message.channel.send("Enter a valid command bro.");
     }
@@ -175,7 +177,7 @@ function help(message) {
     message.channel.send(helpwindow);
 }
 
-function info(message) {
+function info(message, serverQueue) {
 
     if (!serverQueue) {
         message.channel.send(`Nothing is currently playing bro`);
@@ -196,6 +198,19 @@ function pause(message, serverQueue) {
     
     else {
         serverQueue.connection.dispatcher.pause();
+    }
+}
+
+function resume(message, serverQueue) {
+
+    if (serverQueue.connection.dispatcher.pause() == true)
+    {
+        serverQueue.connection.dispatcher.resume();
+    }
+
+    else 
+    {
+        return message.channel.send(`Can't resume if it's not paused`);
     }
 }
 
