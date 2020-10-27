@@ -195,12 +195,12 @@ function toggle(message, serverQueue) {
         message.channel.send(`Nothing is currently playing bro`);
     }
   
-    else if (pausedTrack = false){
+    else if (pausedTrack == false){
         serverQueue.connection.dispatcher.pause();
         pausedTrack = true;
     }
 
-    else if (pausedTrack = true) {
+    else if (pausedTrack == true) {
         serverQueue.connection.dispatcher.resume();
         pausedTrack = false;
     }
