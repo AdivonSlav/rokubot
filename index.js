@@ -56,7 +56,6 @@ client.on('message', async message => {
     }
 });
 
-
 // Checks if the user is in a voice chat and if the bot has the correct perms. If not, it outputs an error
 async function execute(message, serverQueue) {
     const args = message.content.split(" ");
@@ -136,8 +135,8 @@ function play(guild, song) {
         serverQueue.songs.shift();
         play(guild, serverQueue.songs[0]);
     })
-    .on("error", error => console.error(error))
-    .setVolumeLogarithmic(serverQueue.volume / 5);
+    .on("error", error => console.error(error));
+    dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
     serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
 
