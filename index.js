@@ -191,16 +191,14 @@ function info(message) {
     }
 }
 
-function pause(message, serverQueue, guild) {
-    const serverQueue = queue.get(guild.id);
-    const dispatcher = serverQueue.connection;
+function pause(message, serverQueue) {
 
     if (!serverQueue) {
         return message.channel.send(`Nothing is currently playing bro`);
     }
     
     else {
-        dispatcher.pause();
+        serverQueue.connection.dispatcher.pause();
     }
 }
 
