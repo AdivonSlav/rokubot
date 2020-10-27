@@ -201,17 +201,4 @@ function pause(message, serverQueue) {
     }
 }
 
-function resume(message, serverQueue) {
-
-    if (serverQueue.connection.dispatcher.pause() == true)
-    {
-        serverQueue.connection.dispatcher.resume();
-    }
-
-    else 
-    {
-        return message.channel.send(`Can't resume if it's not paused`);
-    }
-}
-
 client.login(token);
