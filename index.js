@@ -71,6 +71,7 @@ async function execute(message, serverQueue) {
     }
 
     // Gets song info from either URL or typed name and saves it into a song objects using ytdl from YouTube
+    let song;
     if (ytdl.validateURL(args[1])) {
         const songInfo = await ytdl.getInfo(args[1]);
         song = {
