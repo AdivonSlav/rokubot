@@ -27,12 +27,13 @@ client.once('disconnect', () => {
     console.log('Disconnect!');
    });
 
+// Creating the queue in global space in order to be able to declare the dispatcher down below
+const serverQueue = queue.get(message.guild.id);
+
 // Reading messages and checking which command to execute. Returning error message if no command is entered
 client.on('message', async message => {
     if (message.author.bot) return;
     if (!message.content.startsWith(prefix)) return;
-
-    const serverQueue = queue.get(message.guild.id);
 
     if (message.content.startsWith(`${prefix}play`)) {
         execute(message, serverQueue);
