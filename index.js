@@ -49,7 +49,10 @@ client.on('message', async message => {
     } else if (message.content.startsWith(`${prefix}info`)) {
         infoTick = true;
         info(message);
-    } else {
+    } else if (message.content.startsWith(`${prefix}pause`)) {
+        pause(message, serverQueue);
+    }
+     else {
         message.channel.send("Enter a valid command bro.");
     }
 });
@@ -119,6 +122,9 @@ async function execute(message, serverQueue) {
     }
 }
 
+// Declaring the dispatcher outside the play function to be able to use it in the pause/resume functions
+const dispatcher = serverQueue.connection;
+
 function play(guild, song) {
     const serverQueue = queue.get(guild.id);
     if (!song) {
@@ -127,13 +133,12 @@ function play(guild, song) {
         return;
     }
 
-    const dispatcher = serverQueue.connection
-    .play(ytdl(song.url))
-    .on("finish", () => {
+    dispatcher.play(ytdl(song.url))
+    dispatcher.on("finish", () => {
         serverQueue.songs.shift();
         play(guild, serverQueue.songs[0]);
     })
-    .on("error", error => console.error(error));
+    dispatcher.on("error", error => console.error(error));
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
     serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
@@ -173,9 +178,24 @@ function help(message) {
 
 function info(message) {
 
-    if (infoTick == true) {
-        message.channel.send(`Currently playing: **${infoTrack}**`)
+    if (infoTick == true && serverQueue) {
+        message.channel.send(`Currently playing: **${infoTrack}**`);
         infoTick = false;
+    }
+
+    else {
+        message.channel.send(`Nothing is currently playing bro`);
+        infoTick = false;
+    }
+}
+
+function pause(message, serverQueue) {
+    if (!serverQueue) {
+        return message.channel.send(`Nothing is currently playing bro`);
+    }
+    
+    else {
+        dispatcher.pause();
     }
 }
 
