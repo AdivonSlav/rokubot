@@ -193,7 +193,7 @@ function info(message, serverQueue) {
 function pause(message, serverQueue) {
 
     if (!serverQueue) {
-        return message.channel.send(`Nothing is currently playing bro`);
+        message.channel.send(`Nothing is currently playing bro`);
     }
     
     else {
