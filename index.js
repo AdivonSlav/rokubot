@@ -209,4 +209,4 @@ function toggle(message, serverQueue) {
     }
 }
 
-client.login(token);
+client.login(BOT_TOKEN);
