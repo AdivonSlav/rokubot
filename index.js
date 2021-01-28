@@ -1,212 +1,88 @@
-// Importing required dependencies
-const Discord = require('discord.js');
-const {
-    prefix,
-    token,
-} = require('./config.json');
+const { Client } = require('discord.js');
+const { TOKEN, PREFIX } = require('./config');
 const ytdl = require('ytdl-core');
-const yts = require('yt-search');
+const ffmpeg = require('ffmpeg');
 
-// Queue where songs are saved and saves track info into a variable
-const queue = new Map();
-var infoTick;
-var infoTrack;
-var pausedTrack;
+const client = new Client({ disableEveryone: true});
 
-// Creating the actual client and logging in with the bot token
-const client = new Discord.Client();
+// Console logging
+client.on('warn', console.warn);
+client.on('error', console.error);
 
-// Console logging when executing
 client.on('ready', () => {
-    console.log('Ready!');
-    client.user.setActivity('Mass Effect - b$help');
-   });
-client.once('reconnecting', () => {
-    console.log('Reconnecting!');
-   });
-client.once('disconnect', () => {
-    console.log('Disconnect!');
-   });
-
-// Reading messages and checking which command to execute. Returning error message if no command is entered
-client.on('message', async message => {
-    if (message.author.bot) return;
-    if (!message.content.startsWith(prefix)) return;
-
-    const serverQueue = queue.get(message.guild.id);
-
-    if (message.content.startsWith(`${prefix}play`)) {
-        execute(message, serverQueue);
-        return;
-    } else if (message.content.startsWith(`${prefix}skip`)) {
-        skip(message, serverQueue);
-        return;
-    } else if (message.content.startsWith(`${prefix}stop`)) {
-        stop(message, serverQueue);
-        return;
-    } else if (message.content.startsWith(`${prefix}help`)) {
-        help(message, serverQueue);
-        return;
-    } else if (message.content.startsWith(`${prefix}info`)) {
-        infoTick = true;
-        info(message, serverQueue);
-    } else if (message.content.startsWith(`${prefix}toggle`)) {
-        toggle(message, serverQueue);
-    } else {
-        message.channel.send("Enter a valid command bro.");
-    }
+    console.log('Primed and ready!')
+    client.user.setActivity('Halid Bešlić', { type: 'LISTENING'})
 });
 
-// Checks if the user is in a voice chat and if the bot has the correct perms. If not, it outputs an error
-async function execute(message, serverQueue) {
-    const args = message.content.split(" ");
+client.on('disconnect', () => console.log('Disconnected, will reconnect...'));
+client.on('reconnecting', () => console.log('I am reconnecting now!'));
 
-    const voiceChannel = message.member.voice.channel;
-    if (!voiceChannel)
-        return message.channel.send("Join the channel first.");
+client.on('message', async msg => {
 
-    const permissions = voiceChannel.permissionsFor(message.client.user);
-    if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
-        return message.channel.send("I don't have the perms to talk or join bro.");
-    }
+    // Prevent the bot from responding to itself, other bots or to commands without the correct prefix
+    if (msg.author.bot)
+        return undefined;
 
-    // Gets song info from either URL or typed name and saves it into a song objects using ytdl from YouTube
-    let song;
-    if (ytdl.validateURL(args[1])) {
-        const songInfo = await ytdl.getInfo(args[1]);
-        song = {
-            title: songInfo.videoDetails.title,
-            url: songInfo.videoDetails.video_url
-        };
-        infoTrack = songInfo.videoDetails.title;
-    } else {
-        const {videos} = await yts(args.slice(1).join(" "));
-        if (!videos.length) return message.channel.send("No songs mate");
-        song = {
-            title: videos[0].title,
-            url: videos[0].url
-        }; 
-        infoTrack = videos[0].title;
-    } 
+    if (!msg.content.startsWith(PREFIX))
+        return undefined;
 
-    // Checks if the serverQueue is defined (music is playing) and if so, adds the song to the queue. If it's not then it creates it and tries to join the channel.
-    if (!serverQueue) {
-        //Creating the actual contract for the queue
-        const queueContract = {
-            textChannel: message.channel,
-            voiceChannel: voiceChannel,
-            connection: null,
-            songs: [],
-            volume: 5,
-            playing: true
-        };
-        // Setting the queue using the contract
-        queue.set(message.guild.id, queueContract);
-        // Pushing the song to the array
-        queueContract.songs.push(song);
+    const args = msg.content.split(' ');
 
-        try {
-            // Trying to join the channel and save the connection into the object
-            var connection = await voiceChannel.join();
-            queueContract.connection = connection;
-            // Calling the play function
-            play(message.guild, queueContract.songs[0]);
-        } catch (err) {
-            // Outputting error if it fails to join the channel
-            console.log(err);
-            queue.delete(message.guild.id);
-            return message.channel.send(err);
-        }
-    } else {
-        serverQueue.songs.push(song);
-        return message.channel.send(`${song.title} has been added to the queue`);
-    }
-}
+    // If the play command is used
+    if (msg.content.startsWith(`${PREFIX}play`)) {
+        const voiceChannel = msg.member.voice.channel;
 
-function play(guild, song) {
-    const serverQueue = queue.get(guild.id);
-    if (!song) {
-        serverQueue.voiceChannel.leave();
-        queue.delete(guild.id);
-        return;
-    }
+        // Prevents a user who is not in the channel with the bot to use the command
+        if (!voiceChannel)
+            return msg.channel.send('Can\'t play music if you\'re not in a channel');
 
-    const dispatcher = serverQueue.connection
-        .play(ytdl(song.url))
-        .on("finish", () => {
-        serverQueue.songs.shift();
-        play(guild, serverQueue.songs[0]);
-    })
-    .on("error", error => console.error(error));
-    dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-    pausedTrack = false;
-    serverQueue.textChannel.send(`Start playing: **${song.title}**`);
-}
+        // Takes the permissions the bot has in the server
+        const permissions = voiceChannel.permissionsFor(msg.client.user);
 
-// Checks if the user that typed the command is in the channel and if there's anything to skip.
-function skip(message, serverQueue) {
-    if (!message.member.voice.channel)
-        return message.channel.send("Can't skip the music if you're not listening to it bro.");
-    if (!serverQueue)
-        return message.channel.send("Can't skip if there's nothing there.");
-    serverQueue.connection.dispatcher.end();
-}
-
-// The skip command clears the song array, deletes the queue and leaves the channel.
-function stop(message, serverQueue) {
-    if (!message.member.voice.channel)
-        return message.channel.send("Can't stop the music if you're not listening to it bro.");
-    serverQueue.songs = [];
-    serverQueue.connection.dispatcher.end();
-}
-
-// The help command lists all the available commands to the user
-function help(message) {
-    const helpwindow = new Discord.MessageEmbed()
-    .setTitle('List of commands')
-    .addFields(
-        {name: 'General',
-        value: "`b$play [URL/Title] (Searches YouTube for the entered title or URL and plays it)`"
-        + "\n`b$skip (Skips the current track that is playing and moves to the next)`"
-        + "\n`b$stop (Stops the bot and disconnects it from the channel)`"
-        + "\n`b$help (Opens this beautiful window)`"  
-        + "\n`b$info (Displays the current track info)`"
-        + "\n`b$toggle (Pauses or resumes the current track)`" 
-    }
-    )
-    message.channel.send(helpwindow);
-}
-
-function info(message, serverQueue) {
-
-    if (!serverQueue) {
-        message.channel.send(`Nothing is currently playing bro`);
-        infoTick = false;
-    }
-
-    else {
-        message.channel.send(`Currently playing: **${infoTrack}**`);
-        infoTick = false;
-    }
-}
-
-function toggle(message, serverQueue) {
+        /*
+        Throws the appropriate error when the bot does not have the perms to 
+        join or speak in a voice channel
+        */
+        if (!permissions.has('CONNECT')) 
+            return msg.channel.send('I can\'t connect, I probably don\'t have permission');
     
-    if (!serverQueue) {
-        message.channel.send(`Nothing is currently playing bro`);
-    }
-  
-    else if (pausedTrack == false){
-        serverQueue.connection.dispatcher.pause();
-        message.channel.send(`Paused!`);
-        pausedTrack = true;
-    }
+        if (!permissions.has('SPEAK'))
+            return msg.channel.send('I can\'t speak in the channel, I probably don\'t have permission');
+        
+        // Checks the connection attempt for errors and throws the appropriate error
+        try {
+            var connection = await voiceChannel.join();
+        } catch (error) {
+            console.error(`I couldn\'t join the voice channel: ${error}`);
+            return msg.channel.send(`I couldn\t join the voice channel: ${error}`);
+        }
 
-    else if (pausedTrack == true) {
-        serverQueue.connection.dispatcher.resume();
-        message.channel.send(`Resumed!`);
-        pausedTrack = false;
-    }
-}
+        // Takes the inserted URL via the play method of ytdl and plays the video
+        const dispatcher = connection.play(ytdl(args[1]))
+            .on('end', () => {
+                console.log('song ended');
+                voiceChannel.leave();
+            })
+            .on('error', () => {
+                console.error(error);
+            });
 
-client.login(process.env.BOT_TOKEN);
+        // Sets the volume of the bot
+        dispatcher.setVolumeLogarithmic(5 / 5);
+
+    } 
+    
+    // If the stop command is used
+    else if (msg.content.startsWith(`${PREFIX}stop`)) {
+
+        // Prevents a user who is not in the channel to stop the bot 
+        if (!msg.member.voice.channel)
+            return msg.channel.send('You\'re not in a voice channel, sorry');
+
+        msg.member.voice.channel.leave();
+        return undefined;
+    }
+})
+
+// The login token required by Discord
+client.login(TOKEN);
