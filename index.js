@@ -1,9 +1,10 @@
 const { Client } = require('discord.js');
 const { TOKEN, PREFIX } = require('./config');
 const ytdl = require('ytdl-core');
-const ffmpeg = require('ffmpeg');
+const ffmpeg = require('ffmpeg-static');
 
 const client = new Client({ disableEveryone: true});
+const queue = new Map();
 
 // Console logging
 client.on('warn', console.warn);
@@ -27,6 +28,7 @@ client.on('message', async msg => {
         return undefined;
 
     const args = msg.content.split(' ');
+    const serverQueue = queue.get(msg.guild.id);
 
     // If the play command is used
     if (msg.content.startsWith(`${PREFIX}play`)) {
@@ -49,27 +51,47 @@ client.on('message', async msg => {
         if (!permissions.has('SPEAK'))
             return msg.channel.send('I can\'t speak in the channel, I probably don\'t have permission');
         
-        // Checks the connection attempt for errors and throws the appropriate error
-        try {
-            var connection = await voiceChannel.join();
-        } catch (error) {
-            console.error(`I couldn\'t join the voice channel: ${error}`);
-            return msg.channel.send(`I couldn\t join the voice channel: ${error}`);
+        const songInfo = await ytdl.getInfo(args[1]) ;
+        const song = {
+            title: songInfo.videoDetails.title,
+            url: songInfo.videoDetails.video_url
         }
 
-        // Takes the inserted URL via the play method of ytdl and plays the video
-        const dispatcher = connection.play(ytdl(args[1]))
-            .on('end', () => {
-                console.log('song ended');
-                voiceChannel.leave();
-            })
-            .on('error', () => {
-                console.error(error);
-            });
+            // If there is no queue, it creates one
+        if (!serverQueue) {
+            const queueConstruct = {
+                textChannel: msg.channel,
+                voiceChannel: voiceChannel,
+                connection: null,
+                songs: [],
+                volume: 5,
+                playing: true
+            };
 
-        // Sets the volume of the bot
-        dispatcher.setVolumeLogarithmic(5 / 5);
+            // Maps the queue to the QueueConstruct
+            queue.set(msg.guild.id, queueConstruct);
 
+            queueConstruct.songs.push(song);
+
+            // Checks the connection attempt for errors and throws the appropriate error
+            try {
+                var connection = await voiceChannel.join();
+                queueConstruct.connection = connection;
+                play(msg.guild, queueConstruct.songs[0]);
+            } catch (error) {
+                console.error(`I couldn\'t join the voice channel: ${error}`);
+                queue.delete(msg.guild.id);
+                return msg.channel.send(`I couldn\t't join the voice channel: ${error}`);
+            }
+        }
+
+        else {
+            serverQueue.songs.push(song);
+            console.log(serverQueue.songs);
+            return msg.channel.send(`I\'ve added **${song.title}** to the queue!`);
+        }
+
+        return undefined;
     } 
     
     // If the stop command is used
@@ -79,10 +101,52 @@ client.on('message', async msg => {
         if (!msg.member.voice.channel)
             return msg.channel.send('You\'re not in a voice channel, sorry');
 
-        msg.member.voice.channel.leave();
+        if (!serverQueue) 
+            return msg.channel.send(`There is nothing playing currently so I can't stop`);
+
+        serverQueue.songs = [];
+        serverQueue.connection.dispatcher.end();
         return undefined;
     }
-})
+
+    // If the skip command is used
+    else if (msg.content.startsWith(`${PREFIX}skip`)) {
+
+        if (!msg.member.voice.channel)
+            return msg.channel.send(`You\'re not in a voice channel, sorry`);
+
+        if (!serverQueue) 
+            return msg.channel.send(`There is nothing playing currently so I can't skip`);
+
+        serverQueue.connection.dispatcher.end();    
+        return undefined;
+    }
+
+    return undefined;
+});
+
+function play(guild, song) {
+    const serverQueue = queue.get(guild.id);
+    
+    if (!song)  {
+        serverQueue.voiceChannel.leave();
+        queue.delete(guild.id);
+        return;
+    }
+
+    console.log(serverQueue.songs);
+
+    const dispatcher = serverQueue.connection.play(ytdl(song.url))
+        .on('finish', () => {
+            console.log('song ended!');
+            serverQueue.songs.shift();
+            play(guild, serverQueue.songs[0]);
+        })
+        .on('error', error => console.error(error));
+
+    dispatcher.setVolumeLogarithmic(5 / 5);
+    serverQueue.textChannel.send(`Started playing: **${song.title}**`);
+}
 
 // The login token required by Discord
 client.login(TOKEN);
