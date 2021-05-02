@@ -1,4 +1,4 @@
-const { Client } = require('discord.js');
+const { Client, MessageEmbed, Util } = require('discord.js');
 const { TOKEN, PREFIX } = require('./config');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('ffmpeg-static');
@@ -12,7 +12,7 @@ client.on('error', console.error);
 
 client.on('ready', () => {
     console.log('Primed and ready!')
-    client.user.setActivity('Halid Bešlić', { type: 'LISTENING'})
+    client.user.setActivity('Baju', { type: 'LISTENING'})
 });
 
 client.on('disconnect', () => console.log('Disconnected, will reconnect...'));
@@ -53,7 +53,7 @@ client.on('message', async msg => {
         
         const songInfo = await ytdl.getInfo(args[1]) ;
         const song = {
-            title: songInfo.videoDetails.title,
+            title: Util.escapeMarkdown(songInfo.videoDetails.title),
             url: songInfo.videoDetails.video_url
         }
 
@@ -100,7 +100,6 @@ client.on('message', async msg => {
         // Prevents a user who is not in the channel to stop the bot 
         if (!msg.member.voice.channel)
             return msg.channel.send('You\'re not in a voice channel, sorry');
-
         if (!serverQueue) 
             return msg.channel.send(`There is nothing playing currently so I can't stop`);
 
@@ -114,12 +113,75 @@ client.on('message', async msg => {
 
         if (!msg.member.voice.channel)
             return msg.channel.send(`You\'re not in a voice channel, sorry`);
-
         if (!serverQueue) 
             return msg.channel.send(`There is nothing playing currently so I can't skip`);
 
         serverQueue.connection.dispatcher.end();    
         return undefined;
+    }
+
+    // If the status command is used
+    else if (msg.content.startsWith(`${PREFIX}status`)) {
+        
+        if (!serverQueue)
+            return msg.channel.send(`There's nothing playing right now`);
+
+        return msg.channel.send(`Now playing: **${serverQueue.songs[0].title}**`);
+    }
+
+    // If the volume command is used
+    else if(msg.content.startsWith(`${PREFIX}volume`)) {
+        if (!msg.member.voice.channel)
+            return msg.channel.send(`You\'re not in a voice channel, sorry`);
+        if (!serverQueue)
+            return msg.channel.send(`There's nothing playing right now`);
+        if (!args[1]) 
+            return msg.channel.send(`The current volume is: **${serverQueue.volume}**`);
+        
+        serverQueue.volume = args[1];
+        serverQueue.connection.dispatcher.setVolumeLogarithmic(args[1] / 5);
+        return msg.channel.send(`Setting volume to: **${args[1]}**`);
+    }
+
+    // If the queue command is used
+    else if(msg.content.startsWith(`${PREFIX}queue`)) {
+        if (!serverQueue)
+            return msg.channel.send(`There's nothing playing right now`);
+
+        const queueEmbed = new MessageEmbed()
+            .setTitle('Current queue')
+            .addField(`Songs:`, `${serverQueue.songs.map(song => `${song.title}`).join(`\n`)}`, true)
+            .addField(`**Now playing:**`, `__${serverQueue.songs[0].title}__`, true)
+
+        return msg.channel.send(queueEmbed);
+    }
+
+    //If the pause command is used
+    else if(msg.content.startsWith(`${PREFIX}pause`)) {
+        if (!msg.member.voice.channel)
+            return msg.channel.send(`You\'re not in a voice channel, sorry`);
+        if (serverQueue && serverQueue.playing) {
+            serverQueue.playing = false;
+            serverQueue.connection.dispatcher.pause();
+            
+            return msg.channel.send(`Pausing...`);
+        }
+        
+        return msg.channel.send(`There's nothing playing right now`);
+    }
+
+    //If the resume command is used
+    else if(msg.content.startsWith(`${PREFIX}resume`)) {
+        if (!msg.member.voice.channel)
+            return msg.channel.send(`You\'re not in a voice channel, sorry`);
+        if (serverQueue && !serverQueue.playing) {
+            serverQueue.playing = true;
+            serverQueue.connection.dispatcher.resume();
+                
+            return msg.channel.send(`Resuming...`);
+        }
+
+        return msg.channel.send(`There's nothing playing right now`);
     }
 
     return undefined;
