@@ -22,4 +22,4 @@ client.on('message', async msg => {
 
 
 // The login token required by Discord
-client.login(TOKEN);
+client.login(BOT_TOKEN);
