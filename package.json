@@ -1,5 +1,5 @@
 {
-  "name": "boembot",
+  "name": "roku",
   "version": "1.0.0",
   "description": "Music and jack-of-all trades bot",
   "main": "index.js",
@@ -9,7 +9,8 @@
     "ffmpeg": "^0.0.4",
     "ffmpeg-static": "^4.3.0",
     "node-opus": "^0.3.3",
-    "ytdl-core": "^4.5.0"
+    "simple-youtube-api": "^5.2.1",
+    "ytdl-core": "^4.7.0"
   },
   "devDependencies": {},
   "scripts": {
