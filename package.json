@@ -10,7 +10,7 @@
     "ffmpeg-static": "^4.3.0",
     "node-opus": "^0.3.3",
     "simple-youtube-api": "^5.2.1",
-    "ytdl-core": "^4.8.0"
+    "ytdl-core": "^4.7.0"
   },
   "devDependencies": {},
   "scripts": {
