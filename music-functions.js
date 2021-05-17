@@ -1,5 +1,5 @@
 const { MessageEmbed, Util } = require('discord.js');
-const { PREFIX, YOUTUBE_API_KEY } = require('./config');
+const { PREFIX } = require('./config');
 const YouTube = require('simple-youtube-api');
 const ytdl = require('ytdl-core');  
 
