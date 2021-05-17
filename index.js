@@ -21,6 +21,4 @@ client.on('message', async msg => {
 
 
 // The login token required by Discord
-//client.login(process.env.BOT_TOKEN);
-
-client.login("NzY3Nzc5NDg4OTM4ODUyMzky.X424Xg.3ZCTw3giHq-YQJkyWJNazbK6eXk");
+client.login(process.env.BOT_TOKEN);

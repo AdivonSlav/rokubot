@@ -3,8 +3,7 @@ const { PREFIX } = require('./config');
 const YouTube = require('simple-youtube-api');
 const ytdl = require('ytdl-core');  
 
-//const youtube = new YouTube(process.env.YOUTUBE_API_KEY);
-const youtube = new YouTube("AIzaSyAal0BYZD1KdQROY7E3loi-cOzdAgiT2M8")
+const youtube = new YouTube(process.env.YOUTUBE_API_KEY);
 const queue = new Map();
 
 async function MusicModule(msg)  {
