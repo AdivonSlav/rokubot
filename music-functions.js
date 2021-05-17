@@ -3,7 +3,8 @@ const { PREFIX } = require('./config');
 const YouTube = require('simple-youtube-api');
 const ytdl = require('ytdl-core');  
 
-const youtube = new YouTube(process.env.YOUTUBE_API_KEY);
+//const youtube = new YouTube(process.env.YOUTUBE_API_KEY);
+const youtube = new YouTube("AIzaSyAal0BYZD1KdQROY7E3loi-cOzdAgiT2M8")
 const queue = new Map();
 
 async function MusicModule(msg)  {
@@ -96,8 +97,8 @@ async function MusicModule(msg)  {
             return msg.channel.send(`There is nothing playing currently so I can't stop`);
 
         serverQueue.songs = [];
-        serverQueue.connection.dispatcher.end("Stopped song!");
-        return undefined;
+        serverQueue.connection.dispatcher.end();
+        return msg.channel.send("Stopping song...");
     }
 
     // If the skip command is used
@@ -108,8 +109,8 @@ async function MusicModule(msg)  {
         if (!serverQueue) 
             return msg.channel.send(`There is nothing playing currently so I can't skip`);
 
-        serverQueue.connection.dispatcher.end("Skipped song!");    
-        return undefined;
+        serverQueue.connection.dispatcher.end();    
+        return msg.channel.send("Skipping song...");
     }
 
     // If the status command is used
@@ -118,7 +119,13 @@ async function MusicModule(msg)  {
         if (!serverQueue)
             return msg.channel.send(`There's nothing playing right now`);
 
-        return msg.channel.send(`Now playing: **${serverQueue.songs[0].title}**`);
+        const songEmbed = new MessageEmbed()
+            .setTitle("Status")
+            .addField(`Playing`, `[${serverQueue.songs[0].title}](${serverQueue.songs[0].url})`, true)
+            .addField(`Length`, (serverQueue.songs[0].duration.hours == 0? ``:`${serverQueue.songs[0].duration.hours}:`) + `${serverQueue.songs[0].duration.minutes}:${serverQueue.songs[0].duration.seconds}`, true)
+            .setImage(`${serverQueue.songs[0].thumbnail}`)
+
+        return msg.channel.send(songEmbed);
     }
 
     // If the volume command is used
@@ -186,7 +193,9 @@ async function handleVideo(video, msg, voiceChannel, playlist = false) {
     const song = {
         id: video.id,
         title: Util.escapeMarkdown(video.title),
-        url: `https://www.youtube.com/watch?v=${video.id}`
+        url: `https://www.youtube.com/watch?v=${video.id}`,
+        duration: video.duration,
+        thumbnail: video.thumbnails.default.url
     }
 
         // If there is no queue, it creates one
@@ -252,7 +261,14 @@ function play(guild, song) {
         .on('error', error => console.error(error));
 
     dispatcher.setVolumeLogarithmic(5 / 5);
-    serverQueue.textChannel.send(`Started playing: **${song.title}**`);
+
+    const songEmbed = new MessageEmbed()
+        .setTitle("Status")
+        .addField(`Playing:`, `[${serverQueue.songs[0].title}](${serverQueue.songs[0].url})`, true)
+        .addField(`Length:`, (serverQueue.songs[0].duration.hours == 0? ``:`${serverQueue.songs[0].duration.hours}:`) + `${serverQueue.songs[0].duration.minutes}:${serverQueue.songs[0].duration.seconds}`, true)
+        .setImage(`${serverQueue.songs[0].thumbnail}`)
+
+    serverQueue.textChannel.send(songEmbed);
 }
 
 module.exports.MusicModule = MusicModule;
