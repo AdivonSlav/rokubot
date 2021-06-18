@@ -1,6 +1,7 @@
 const { Client } = require('discord.js');
-
 const music = require('./music-functions.js');
+const {BOT_TOKEN} = require('./config.js');
+
 const client = new Client({ disableEveryone: true});
 
 // Console logging
@@ -19,6 +20,4 @@ client.on('message', async msg => {
     music.MusicModule(msg);
 });
 
-
-// The login token required by Discord
-client.login(process.env.BOT_TOKEN);
+client.login(BOT_TOKEN);
