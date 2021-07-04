@@ -4,11 +4,14 @@
   "description": "Music and jack-of-all trades bot",
   "main": "index.js",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
     "common-tags": "^1.8.0",
     "discord.js": "^12.5.3",
     "ffmpeg": "^0.0.4",
     "ffmpeg-static": "^4.3.0",
+    "node-fetch": "^2.6.1",
     "node-opus": "^0.3.3",
+    "puppeteer": "^10.0.0",
     "simple-youtube-api": "^5.2.1",
     "ytdl-core": "^4.7.0"
   },

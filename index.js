@@ -1,6 +1,7 @@
 const { Client } = require('discord.js');
-const music = require('./music-functions.js');
-const {BOT_TOKEN} = require('./config.js');
+const { MusicModule } = require('./music-functions.js');
+const { Scraper } = require('./scraper.js');
+const { BOT_TOKEN } = require('./config.js');
 
 const client = new Client({ disableEveryone: true});
 
@@ -11,13 +12,23 @@ client.on('error', console.error);
 client.on('ready', () => {
     console.log('Primed and ready!')
     client.user.setActivity('Baju', { type: 'LISTENING'})
+
+    
+    try {
+        (async() => {
+            Scraper();
+        }
+        )();
+    } catch (error) {
+        console.log(error);
+    }
 });
 
 client.on('disconnect', () => console.log('Disconnected, will reconnect...'));
 client.on('reconnecting', () => console.log('I am reconnecting now!'));
 
 client.on('message', async msg => {
-    music.MusicModule(msg);
+    MusicModule(msg);
 });
 
 client.login(BOT_TOKEN);
