@@ -14,6 +14,6 @@ If for some reason you want to build and test the bot code on your own, edit the
 The bot needs the following dependencies:
 
 ```
-common-tags, discord.js, ffmpeg, ffmpeg-static, node-opus, simple-youtube-api, ytdl-core, node-fetch
+common-tags, discord.js, ffmpeg, ffmpeg-static, node-opus, simple-youtube-api, ytdl-core, node-fetch, puppeteer, cheerio
 ```
 
