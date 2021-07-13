@@ -13,7 +13,12 @@ const webhookClient = new Discord.WebhookClient(WEBHOOK_ID, WEBHOOK_TOKEN);
 
 // Async function to handle logging into the site through the Puppeteer browser
 async function pageLogin(page) {
-    await page.goto(url);
+    try {
+        await page.goto(url);
+    } catch (error) {
+        console.log("SCRAPER Error: " + error);
+        return null
+    }
     
     // Try-catches the login process
     try {
@@ -64,8 +69,7 @@ async function Scraper() {
         
         const titleTag = $("#lnkNaslov").slice(0,1).text();
 
-        // Scrapes the last news post and stores it into the news object
-        if (await checkLast(titleTag) != false) {
+        if (await checkLast(titleTag) != false && titleTag != "") {
             $('.newslist').slice(0, 1).each(function() {
                 const title = $(this).find('#lnkNaslov').text();
                 const url = $(this).find('#lnkNaslov').attr('href');
@@ -87,13 +91,13 @@ async function Scraper() {
 
         await writeData(titleTag);
         
-        // Sleeps the function for 5 minutes and then reloads the browser to scrape again
         try {
             await sleep(300000);
             await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
             
         } catch (error) {
-            console.log(error);
+            console.log("SCRAPER Error: " + error);
+            return null;
         }
     }
 }
@@ -129,12 +133,11 @@ function sendMessage(news) {
         .setFooter(`Roku - ${dFormat}`, '');
 
     console.log("SCRAPER: Sending new post...");
-    webhookClient.send('@everyone', {
+    webhookClient.send('', {
         embeds: [newsEmbed],
     });
 }
 
-// Simply posts the latest news title to a JSON file
 async function writeData(titleTag) {
     const payload = {
         title: titleTag
@@ -149,14 +152,13 @@ async function writeData(titleTag) {
     })
         .then(response => response.json())
         .then(payload => {
-            console.log('Posted new title to JSON:', payload);
+            console.log('SCRAPER: Posted new title to JSON:', payload);
         })
         .catch((error) => {
             console.error('SCRAPER Error:', error);
         });
 }
 
-// Checks if the newest scraped title is identical to the posted one, to verify if it is a new news post
 async function checkLast(titleTag) {
     
     try {
