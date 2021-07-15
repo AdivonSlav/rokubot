@@ -1,26 +1,45 @@
-const { Client } = require('discord.js');
-const { MusicModule } = require('./music-functions.js');
+const { Client, Collection } = require('discord.js');
 const { Scraper } = require('./scraper.js');
-const { BOT_TOKEN } = require('./config.js');
+const { PREFIX, BOT_TOKEN } = require('./config.js');
+const { getSongEmbed, getTrackAddEmbed } = require('./utils/embeds.js');
+const { Player } = require("discord-player");
+const fs = require('fs');
+const chalk = require('chalk');
 
 const client = new Client({ disableEveryone: true});
+client.commands = new Collection();
+
+fs.readdirSync('./commands').forEach(dirs => {
+    const commands = fs.readdirSync(`./commands/${dirs}`).filter(files => files.endsWith('.js'));
+
+    for (const file of commands) {
+        const command = require(`./commands/${dirs}/${file}`);
+        client.commands.set(command.name.toLowerCase(), command);
+    }
+})
+
+const player = new Player(client);
+client.player = player;
+client.player.on("trackStart", async (msg, track) => msg.channel.send(getSongEmbed(track)));
+client.player.on("trackAdd", async (msg, queue, track) => msg.channel.send(getTrackAddEmbed(track)));
+
+/////////////////////////////////////////////////////////////////////
 
 // Console logging
 client.on('warn', console.warn);
 client.on('error', console.error);
 
 client.on('ready', () => {
-    console.log('Primed and ready!')
+    console.log(chalk.green('(MAIN): Primed and ready!'))
     client.user.setActivity('Baju', { type: 'LISTENING'})
 
-    
     try {
         (async() => {
             Scraper();
         }
         )();
     } catch (error) {
-        console.log(error);
+        console.log(chalk.red(error));
     }
 });
 
@@ -28,7 +47,25 @@ client.on('disconnect', () => console.log('Disconnected, will reconnect...'));
 client.on('reconnecting', () => console.log('I am reconnecting now!'));
 
 client.on('message', async msg => {
-    MusicModule(msg);
+    // Prevent the bot from responding to itself, other bots or to commands without the correct prefix
+    if (msg.author.bot)
+        return null;
+
+    if (!msg.content.startsWith(PREFIX))
+        return null;
+
+    const args = msg.content.slice(PREFIX.length).trim().split(/ +/g);
+    const command = args.shift().toLowerCase();
+
+    try {
+        const cmd = client.commands.get(command) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(command));
+        if (cmd) {
+            cmd.execute(msg, client, args);
+        }
+    } catch (error) {
+        console.error(chalk.red("(MAIN) " + error));
+        msg.reply('There was an error trying to run that command.');
+    }
 });
 
 client.login(BOT_TOKEN);

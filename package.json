@@ -1,32 +1,32 @@
 {
   "name": "roku",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Music and jack-of-all trades bot",
   "main": "index.js",
   "dependencies": {
+    "@discordjs/opus": "^0.5.3",
+    "chalk": "^4.1.1",
     "cheerio": "^1.0.0-rc.10",
     "common-tags": "^1.8.0",
+    "discord-player": "^4.1.4",
     "discord.js": "^12.5.3",
     "ffmpeg": "^0.0.4",
     "ffmpeg-static": "^4.3.0",
     "node-fetch": "^2.6.1",
-    "node-opus": "^0.3.3",
-    "puppeteer": "^10.0.0",
-    "simple-youtube-api": "^5.2.1",
-    "ytdl-core": "^4.7.0"
+    "puppeteer": "^10.0.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "r$"
+    "test": "$"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AdivonSlav/boembot.git"
+    "url": "git+https://github.com/AdivonSlav/rokubot.git"
   },
   "author": "Adi",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AdivonSlav/boembot/issues"
+    "url": "https://github.com/AdivonSlav/rokubot/issues"
   },
-  "homepage": "https://github.com/AdivonSlav/boembot#readme"
+  "homepage": "https://github.com/AdivonSlav/rokubot"
 }

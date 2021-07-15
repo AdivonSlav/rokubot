@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
+const chalk = require('chalk');
 
 const {LOGIN_USERNAME, LOGIN_PASSWORD, BACKGROUND_IMAGE, WEBHOOK_ID, WEBHOOK_TOKEN, JSON_URL } = require('./config.js');
 
@@ -16,8 +17,8 @@ async function pageLogin(page) {
     try {
         await page.goto(url);
     } catch (error) {
-        console.log("SCRAPER Error: " + error);
-        return null
+        console.log(chalk.red("(SCRAPER): " + error));
+        return false;
     }
     
     // Try-catches the login process
@@ -38,10 +39,11 @@ async function pageLogin(page) {
             await page.click('[name="btnPrijava"]'),
         ]);
         
-        return console.log("SCRAPER: Logged in succesfully.");
+        console.log(chalk.green("(SCRAPER): Logged in succesfully."))
+        return true;
     } catch (error) {
-        console.log("SCRAPER Error: " + error);
-        return null
+        console.log(chalk.red("(SCRAPER): " + error));
+        return false;
     }
 }
 
@@ -52,10 +54,17 @@ async function Scraper() {
         args: ['--no-sandbox','--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
+    var logged = false;
+
+    while (logged == false) {
+        logged = await pageLogin(page);
+        if (logged) {
+            break;
+        }
+        await sleep(300000);
+    }
     
-    await pageLogin(page);
-    
-    while (true) {
+    while (logged == true) {
         const content = await page.content();
         const $ = cheerio.load(content);
         const news = {
@@ -96,7 +105,7 @@ async function Scraper() {
             await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
             
         } catch (error) {
-            console.log("SCRAPER Error: " + error);
+            console.log(chalk.red("(SCRAPER): " + error));
             return null;
         }
     }
@@ -104,7 +113,7 @@ async function Scraper() {
 
 // Simple sleep function in ms
 function sleep(ms) {
-    console.log("SCRAPER: Sleeping for " + ms);
+    console.log(chalk.yellow("(SCRAPER): Sleeping for " + ms));
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -119,7 +128,7 @@ function sendMessage(news) {
         var hour = news.date.substr(11, 2);
         var minute = news.date.substr(14, 2);
     } catch (error) {
-        console.log("SCRAPER Error: " + error);
+        console.log(chalk.red("(SCRAPER): " + error));
     }
     
     const dFormat = `${day}.${month}.${year} ${hour}:${minute}`;
@@ -132,7 +141,7 @@ function sendMessage(news) {
         .setThumbnail(BACKGROUND_IMAGE)
         .setFooter(`Roku - ${dFormat}`, '');
 
-    console.log("SCRAPER: Sending new post...");
+    console.log(chalk.green("(SCRAPER): Sending new post..."));
     webhookClient.send('', {
         embeds: [newsEmbed],
     });
@@ -152,10 +161,10 @@ async function writeData(titleTag) {
     })
         .then(response => response.json())
         .then(payload => {
-            console.log('SCRAPER: Posted new title to JSON:', payload);
+            console.log(chalk.green('(SCRAPER): Posted new title to JSON:', titleTag));
         })
         .catch((error) => {
-            console.error('SCRAPER Error:', error);
+            console.error(chalk.red('(SCRAPER):', error));
         });
 }
 
@@ -165,7 +174,7 @@ async function checkLast(titleTag) {
         var response = await fetch(JSON_URL);
         var obj = await response.json();
     } catch (error) {
-        console.error("SCRAPER Error: " + error);
+        console.error(chalk.red("(SCRAPER): " + error));
     }
 
     if (obj.title == titleTag) {
