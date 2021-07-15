@@ -1,6 +1,6 @@
 # Roku
 
-#  ![](https://i.imgur.com/aXM2p3xt.png)
+#  ![Roku-bot](https://i.imgur.com/GN6D1Z5.png)
 
 Roku is a small project I started to start learning Javascript. It's a Discord music bot with the following functionalities currently implemented:
 
