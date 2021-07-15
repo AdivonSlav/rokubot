@@ -1,6 +1,5 @@
 exports.PREFIX = '$';
 exports.BOT_TOKEN = process.env.BOT_TOKEN;
-exports.YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 exports.JSON_URL = process.env.JSON_URL;
 exports.WEBHOOK_ID = process.env.WEBHOOK_ID;
 exports.WEBHOOK_TOKEN = process.env.WEBHOOK_TOKEN;
