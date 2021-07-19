@@ -1,6 +1,6 @@
 module.exports = {
     name: 'stop',
-	description: 'Stops song',
+	description: 'Stops the current track',
     usage: "[]",
 	execute(msg, client) {
         if (!msg.member.voice.channel)
@@ -10,6 +10,7 @@ module.exports = {
 
         if (client.player.stop(msg)) {
             msg.channel.send("Stopped playing...");
+            msg.react('⏹️');
         }
         else {
             msg.channel.send("There was an error trying to stop");

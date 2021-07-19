@@ -24,6 +24,7 @@ module.exports = {
             .setImage(current_track.thumbnail)
             .setFooter('Roku', '');
 
-        msg.channel.send(songEmbed);
+        msg.react('ℹ️');
+        return msg.channel.send(songEmbed);
 	},
 }

@@ -4,7 +4,8 @@ const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const chalk = require('chalk');
 
-const {LOGIN_USERNAME, LOGIN_PASSWORD, BACKGROUND_IMAGE, WEBHOOK_ID, WEBHOOK_TOKEN, JSON_URL } = require('./config.js');
+const {LOGIN_USERNAME, LOGIN_PASSWORD, WEBHOOK_ID, WEBHOOK_TOKEN, JSON_URL } = require('./config.js');
+const { getNewsEmbed } = require('./utils/embeds.js');
 
 ////////////////////////////////////////////////////
 
@@ -119,31 +120,9 @@ function sleep(ms) {
 
 // Creates a Discord Embed and fills it with the scraped data then makes a HTTP request to the webhook in order to post the embed
 function sendMessage(news) {
-
-    // 03.07.2021 10:25
-    try {
-        var day = news.date.substr(0,2);
-        var month = news.date.substr(3,2);
-        var year = news.date.substr(6,4);
-        var hour = news.date.substr(11, 2);
-        var minute = news.date.substr(14, 2);
-    } catch (error) {
-        console.log(chalk.red("(SCRAPER): " + error));
-    }
-    
-    const dFormat = `${day}.${month}.${year} ${hour}:${minute}`;
-
-    const newsEmbed = new Discord.MessageEmbed()
-        .setTitle(news.title)
-        .setURL(`https://www.fit.ba/student/${news.url}`)
-        .setAuthor(news.author)
-        .setDescription(news.description)
-        .setThumbnail(BACKGROUND_IMAGE)
-        .setFooter(`Roku - ${dFormat}`, '');
-
     console.log(chalk.green("(SCRAPER): Sending new post..."));
     webhookClient.send('', {
-        embeds: [newsEmbed],
+        embeds: [getNewsEmbed(news)],
     });
 }
 

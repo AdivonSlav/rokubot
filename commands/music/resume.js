@@ -11,6 +11,7 @@ module.exports = {
 
         if (client.player.resume(msg)) {
             msg.channel.send("Resuming...");
+            msg.react('▶️');
         }
         else {
             msg.channel.send("There was a problem while resuming the track");

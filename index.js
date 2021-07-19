@@ -1,13 +1,15 @@
 const { Client, Collection } = require('discord.js');
 const { Scraper } = require('./scraper.js');
 const { PREFIX, BOT_TOKEN } = require('./config.js');
-const { getSongEmbed, getTrackAddEmbed } = require('./utils/embeds.js');
 const { Player } = require("discord-player");
 const fs = require('fs');
 const chalk = require('chalk');
 
 const client = new Client({ disableEveryone: true});
+const player = new Player(client);
 client.commands = new Collection();
+client.player = player;
+chalk.enabled = true;
 
 fs.readdirSync('./commands').forEach(dirs => {
     const commands = fs.readdirSync(`./commands/${dirs}`).filter(files => files.endsWith('.js'));
@@ -18,10 +20,17 @@ fs.readdirSync('./commands').forEach(dirs => {
     }
 })
 
-const player = new Player(client);
-client.player = player;
-client.player.on("trackStart", async (msg, track) => msg.channel.send(getSongEmbed(track)));
-client.player.on("trackAdd", async (msg, queue, track) => msg.channel.send(getTrackAddEmbed(track)));
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+    console.log(chalk.green(`(MAIN): Loading event ${file}`));
+	const event = require(`./events/${file}`);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.player.on(event.name, (...args) => event.execute(...args));
+	}
+}
 
 /////////////////////////////////////////////////////////////////////
 

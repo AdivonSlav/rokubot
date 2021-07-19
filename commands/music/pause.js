@@ -11,6 +11,7 @@ module.exports = {
 
         if (client.player.pause(msg)) {
             msg.channel.send("Pausing...");
+            msg.react('⏸️');
         }
         else {
             msg.channel.send("There was a problem while pausing the track");

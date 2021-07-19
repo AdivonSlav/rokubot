@@ -11,6 +11,7 @@ module.exports = {
 
         if (client.player.skip(msg)) {
             msg.channel.send("Skipping song...");
+            msg.react('⏭️');
         }
         else {
             msg.channel.send("Could not skip track");
