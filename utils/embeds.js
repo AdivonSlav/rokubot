@@ -1,4 +1,3 @@
-const { add } = require('cheerio/lib/api/traversing');
 const { MessageEmbed } = require('discord.js');
 const { LOGO } = require("../config.js");
 
@@ -43,7 +42,7 @@ function getNewsEmbed(news) {
         
     const dFormat = `${day}.${month}.${year} ${hour}:${minute}`;
 
-    const newsEmbed = new Discord.MessageEmbed()
+    const newsEmbed = new MessageEmbed()
         .setTitle(news.title)
         .setColor('#fff')
         .setURL(`https://www.fit.ba/student/${news.url}`)
