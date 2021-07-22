@@ -7,4 +7,4 @@ exports.WEBHOOK_TOKEN = process.env.WEBHOOK_TOKEN;
 
 exports.LOGIN_USERNAME = process.env.LOGIN_USERNAME;
 exports.LOGIN_PASSWORD = process.env.LOGIN_PASSWORD;
-exports.LOGO = process.env.BACKGROUND_IMAGE;
+exports.LOGO = process.env.LOGO;
