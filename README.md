@@ -5,7 +5,7 @@
 Roku is a small project I started to start learning Javascript. It's a Discord music bot with the following functionalities currently implemented:
 
 - Playing from URL or text input (from YouTube & Spotify)
-- Queue support with skip, pause, stop, resume and now playing commands
+- Queue support with skip, pause, stop, resume and more
 - Custom Discord embeds
 
 Furthermore I've been working on integrating a modified version of my Mesh Scraper into Roku, so far it is able to scrape and post via a Discord webhook alongside the normal music functionalities.
